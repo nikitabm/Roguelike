@@ -12,6 +12,22 @@ namespace Rg.Core
     // Our custom DungeonMap class extends the base RogueSharp Map class
     public class DungeonMap : Map
     {
+        public List<Rectangle> Rooms;
+
+        public DungeonMap()
+        {
+            Rooms = new List<Rectangle>();
+        }
+
+       
+
+        public void AddPlayer(Player player)
+        {
+            Game.Player = player;
+            SetIsWalkable(player.X, player.Y, false);
+            UpdatePlayerFieldOfView();
+        }
+
         // The Draw method will be called each time the map is updated
         // It will render all of the symbols/colors for each cell to the map sub console
         public void Draw(RLConsole mapConsole)

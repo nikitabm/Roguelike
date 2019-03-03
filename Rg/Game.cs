@@ -5,14 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using RLNET;
 using Rg.Core;
+using RogueSharp.Random;
 
 public static class Game
 {
 
 
     //public 
-
-    public static Player Player { get; private set; }
+    public static IRandom Random { get; private set; }
+    public static Player Player { get; set; }
     public static DungeonMap DungeonMap { get; private set; }
     public static CommandSystem CommandSystem { get; private set; }
 
@@ -51,10 +52,18 @@ public static class Game
 
     public static void Main()
     {
-        CommandSystem = new CommandSystem();
-        Player = new Player();
+        int seed = (int)DateTime.UtcNow.Ticks;
+        Random = new DotNetRandom(seed);
 
-        MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight);
+        // The title will appear at the top of the console window 
+        // also include the seed used to generate the level
+        string consoleTitle = $"rogue Seed {seed}";
+        CommandSystem = new CommandSystem();
+
+        //Player = new Player();
+
+        //generate map
+        MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7);
         DungeonMap = mapGenerator.CreateMap();
 
         DungeonMap.UpdatePlayerFieldOfView();
@@ -69,7 +78,7 @@ public static class Game
         settings.ResizeType = RLResizeType.ResizeCells;
         settings.WindowBorder = RLWindowBorder.Fixed;
         settings.StartWindowState = RLWindowState.Normal;
-        settings.Title = "RougeSharp V3 Tutorial - Level 1";
+        settings.Title = consoleTitle;
 
         _rootConsole = new RLRootConsole(settings);
 
