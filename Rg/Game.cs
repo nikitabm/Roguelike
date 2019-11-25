@@ -30,22 +30,22 @@ public static class Game
     private static RLRootConsole _rootConsole;
 
     // The map console takes up most of the screen and is where the map will be drawn
-    private static readonly int _mapWidth = 70;
-    private static readonly int _mapHeight = 45;
+    private static readonly int _mapWidth = 100;
+    private static readonly int _mapHeight = 60;
     private static RLConsole _mapConsole;
 
     // Below the map console is the message console which displays attack rolls and other information
-    private static readonly int _messageWidth = 70;
+    private static readonly int _messageWidth = 100;
     private static readonly int _messageHeight = 10;
     private static RLConsole _messageConsole;
 
     // The stat console is to the right of the map and display player and monster stats
     private static readonly int _statWidth = 20;
-    private static readonly int _statHeight = 65;
+    private static readonly int _statHeight = 40;
     private static RLConsole _statConsole;
 
     // Above the map is the inventory console which shows the players equipment, abilities, and items
-    private static readonly int _inventoryWidth = 70;
+    private static readonly int _inventoryWidth = 100;
     private static readonly int _inventoryHeight = 10;
     private static RLConsole _inventoryConsole;
 
@@ -80,7 +80,7 @@ public static class Game
         settings.Width = _screenWidth;
         settings.Height = _screenHeight;
         settings.Scale = 1.0f;
-        settings.ResizeType = RLResizeType.None;
+        settings.ResizeType = RLResizeType.ResizeCells;
         settings.WindowBorder = RLWindowBorder.Fixed;
         settings.StartWindowState = RLWindowState.Normal;
         settings.Title = consoleTitle;
@@ -160,16 +160,12 @@ public static class Game
             Player.Draw(_mapConsole, DungeonMap);
             Player.DrawStats(_statConsole);
 
-            // Blit the sub consoles to the root console in the correct locations
 
-            RLConsole.Blit(_mapConsole, 0, 0, _mapWidth, _mapHeight,
-              _rootConsole, 0, _inventoryHeight);
-            RLConsole.Blit(_statConsole, 0, 0, _statWidth, _statHeight,
-              _rootConsole, _mapWidth, 0);
-            RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight,
-              _rootConsole, 0, _screenHeight - _messageHeight);
-            RLConsole.Blit(_inventoryConsole, 0, 0, _inventoryWidth, _inventoryHeight,
-              _rootConsole, 0, 0);
+            // Blit the sub consoles to the root console in the correct locations
+            RLConsole.Blit(_mapConsole, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, _inventoryHeight);
+            RLConsole.Blit(_statConsole, 0, 0, _statWidth, _statHeight, _rootConsole, _mapWidth, 0);
+            RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _screenHeight );
+            RLConsole.Blit(_inventoryConsole, 0, 0, _inventoryWidth, _inventoryHeight,_rootConsole, 0, 0);
 
             // Tell RLNET to draw the console that we set
             _rootConsole.Draw();
