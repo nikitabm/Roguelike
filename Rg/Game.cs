@@ -30,8 +30,8 @@ public static class Game
     private static RLRootConsole _rootConsole;
 
     // The map console takes up most of the screen and is where the map will be drawn
-    private static readonly int _mapWidth = 100;
-    private static readonly int _mapHeight = 60;
+    private static readonly int _mapWidth = 80;
+    private static readonly int _mapHeight = 50;
     private static RLConsole _mapConsole;
 
     // Below the map console is the message console which displays attack rolls and other information
@@ -45,7 +45,7 @@ public static class Game
     private static RLConsole _statConsole;
 
     // Above the map is the inventory console which shows the players equipment, abilities, and items
-    private static readonly int _inventoryWidth = 100;
+    private static readonly int _inventoryWidth = 80;
     private static readonly int _inventoryHeight = 10;
     private static RLConsole _inventoryConsole;
 
@@ -80,7 +80,7 @@ public static class Game
         settings.Width = _screenWidth;
         settings.Height = _screenHeight;
         settings.Scale = 1.0f;
-        settings.ResizeType = RLResizeType.ResizeCells;
+        settings.ResizeType = RLResizeType.ResizeScale;
         settings.WindowBorder = RLWindowBorder.Fixed;
         settings.StartWindowState = RLWindowState.Normal;
         settings.Title = consoleTitle;
@@ -122,19 +122,19 @@ public static class Game
 
         if (keyPress != null)
         {
-            if (keyPress.Key == RLKey.W)
+            if ((keyPress.Key == RLKey.W) || (keyPress.Key == RLKey.Up))
             {
                 didPlayerAct = CommandSystem.MovePlayer(Direction.Up);
             }
-            else if (keyPress.Key == RLKey.S)
+            else if (keyPress.Key == RLKey.S || (keyPress.Key == RLKey.Down))
             {
                 didPlayerAct = CommandSystem.MovePlayer(Direction.Down);
             }
-            else if (keyPress.Key == RLKey.A)
+            else if (keyPress.Key == RLKey.A || (keyPress.Key == RLKey.Left))
             {
                 didPlayerAct = CommandSystem.MovePlayer(Direction.Left);
             }
-            else if (keyPress.Key == RLKey.D)
+            else if (keyPress.Key == RLKey.D|| (keyPress.Key == RLKey.Right))
             {
                 didPlayerAct = CommandSystem.MovePlayer(Direction.Right);
             }
@@ -164,8 +164,8 @@ public static class Game
             // Blit the sub consoles to the root console in the correct locations
             RLConsole.Blit(_mapConsole, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, _inventoryHeight);
             RLConsole.Blit(_statConsole, 0, 0, _statWidth, _statHeight, _rootConsole, _mapWidth, 0);
-            RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _screenHeight );
-            RLConsole.Blit(_inventoryConsole, 0, 0, _inventoryWidth, _inventoryHeight,_rootConsole, 0, 0);
+            RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _mapHeight+_inventoryHeight);
+            RLConsole.Blit(_inventoryConsole, 0, 0, _inventoryWidth, _inventoryHeight, _rootConsole, 0, 0);
 
             // Tell RLNET to draw the console that we set
             _rootConsole.Draw();
