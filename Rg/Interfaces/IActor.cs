@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Rg.Core;
 
 namespace Rg.Interfaces
 {
@@ -18,5 +19,8 @@ namespace Rg.Interfaces
         int MaxHealth { get; set; }
         string Name { get; set; }
         int Speed { get; set; }
+        int? TurnsAlerted { get; set; }
+
+        void PerformAction(CommandSystem commandSystem);
     }
 }

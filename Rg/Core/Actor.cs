@@ -9,12 +9,13 @@ using RogueSharp;
 
 namespace Rg.Core
 {
-    public class Actor : IActor, IDrawable
+    public class Actor : IActor, IDrawable, IScheduleable
     {
         // IActor
         private int _attack;
         private int _attackChance;
         private int _awareness;
+        private int? _turnsAlerted;
         private int _defense;
         private int _defenseChance;
         private int _gold;
@@ -58,6 +59,17 @@ namespace Rg.Core
             set
             {
                 _awareness = value;
+            }
+        }
+        public int? TurnsAlerted
+        {
+            get
+            {
+                return _turnsAlerted;
+            }
+            set
+            {
+                _turnsAlerted = value;
             }
         }
 
@@ -145,6 +157,21 @@ namespace Rg.Core
             }
         }
 
+        public virtual void PerformAction(CommandSystem commandSystem)
+        {
+            throw new NotImplementedException();
+        }
+
+        // IScheduleable
+        public int Time
+        {
+            get
+            {
+                return Speed;
+            }
+        }
+
+
         // IDrawable
         public RLColor Color { get; set; }
         public char Symbol { get; set; }
@@ -171,5 +198,7 @@ namespace Rg.Core
                 console.Set(X, Y, Colors.Floor, Colors.FloorBackground, '.');
             }
         }
+
+
     }
 }

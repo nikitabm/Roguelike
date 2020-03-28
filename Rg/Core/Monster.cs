@@ -1,10 +1,16 @@
 ﻿using System;
+using Rg.Behaviors;
 using RLNET;
 
 namespace Rg.Core
 {
-    public class Monster:Actor
+    public class Monster : Actor
     {
+        public override void PerformAction(CommandSystem commandSystem)
+        {
+            var behavior = new StandardMoveAndAttack();
+            behavior.Act(this, commandSystem);
+        }
         public void DrawStats(RLConsole statConsole, int position)
         {
             // Start at Y=13 which is below the player stats.

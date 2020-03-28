@@ -67,6 +67,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Monster.cs" />
     <Compile Include="Monsters\Kobold.cs" />
+    <Compile Include="Interfaces\IScheduleable.cs" />
+    <Compile Include="Core\SchedulingSystem.cs" />
+    <Compile Include="Interfaces\IBehavior.cs" />
+    <Compile Include="Behaviors\StandardMoveAndAttack.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -80,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Monsters\" />
+    <Folder Include="Behaviors\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

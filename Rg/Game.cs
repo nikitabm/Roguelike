@@ -17,6 +17,7 @@ public static class Game
     public static Player Player { get; set; }
     public static DungeonMap DungeonMap { get; private set; }
     public static CommandSystem CommandSystem { get; private set; }
+    public static SchedulingSystem SchedulingSystem { get; private set; }
 
     private static bool _renderRequired = true;
 
@@ -58,18 +59,19 @@ public static class Game
 
         // The title will appear at the top of the console window 
         // also include the seed used to generate the level
-        string consoleTitle = $"rogue Seed {seed}";
+        string consoleTitle = $"game seed {seed}";
+
         CommandSystem = new CommandSystem();
-
-
+        SchedulingSystem = new SchedulingSystem();
         MessageLog = new MessageLog();
 
-        MessageLog.Add("The rogue arrives on level 1");
-        MessageLog.Add($"Level created with seed '{seed}'");
 
         //generate map
         MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7);
         DungeonMap = mapGenerator.CreateMap();
+
+        MessageLog.Add("The rogue " + Player.Name + " arrives on level 1");
+        MessageLog.Add($"Level created with seed '{seed}'");
 
         DungeonMap.UpdatePlayerFieldOfView();
 
@@ -115,37 +117,43 @@ public static class Game
 
     static void OnUpdate(object sender, UpdateEventArgs e)
     {
-
-
         bool didPlayerAct = false;
         RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
 
-        if (keyPress != null)
+        if (CommandSystem.IsPlayerTurn)
         {
-            if ((keyPress.Key == RLKey.W) || (keyPress.Key == RLKey.Up))
+            if (keyPress != null)
             {
-                didPlayerAct = CommandSystem.MovePlayer(Direction.Up);
+                if ((keyPress.Key == RLKey.W) || (keyPress.Key == RLKey.Up))
+                {
+                    didPlayerAct = CommandSystem.MovePlayer(Direction.Up);
+                }
+                else if (keyPress.Key == RLKey.S || (keyPress.Key == RLKey.Down))
+                {
+                    didPlayerAct = CommandSystem.MovePlayer(Direction.Down);
+                }
+                else if (keyPress.Key == RLKey.A || (keyPress.Key == RLKey.Left))
+                {
+                    didPlayerAct = CommandSystem.MovePlayer(Direction.Left);
+                }
+                else if (keyPress.Key == RLKey.D || (keyPress.Key == RLKey.Right))
+                {
+                    didPlayerAct = CommandSystem.MovePlayer(Direction.Right);
+                }
+                else if (keyPress.Key == RLKey.Escape)
+                {
+                    _rootConsole.Close();
+                }
             }
-            else if (keyPress.Key == RLKey.S || (keyPress.Key == RLKey.Down))
+            if (didPlayerAct)
             {
-                didPlayerAct = CommandSystem.MovePlayer(Direction.Down);
-            }
-            else if (keyPress.Key == RLKey.A || (keyPress.Key == RLKey.Left))
-            {
-                didPlayerAct = CommandSystem.MovePlayer(Direction.Left);
-            }
-            else if (keyPress.Key == RLKey.D|| (keyPress.Key == RLKey.Right))
-            {
-                didPlayerAct = CommandSystem.MovePlayer(Direction.Right);
-            }
-            else if (keyPress.Key == RLKey.Escape)
-            {
-                _rootConsole.Close();
+                _renderRequired = true;
+                CommandSystem.EndPlayerTurn();
             }
         }
-
-        if (didPlayerAct)
+        else
         {
+            CommandSystem.ActivateActors();
             _renderRequired = true;
         }
     }
@@ -168,7 +176,7 @@ public static class Game
             // Blit the sub consoles to the root console in the correct locations
             RLConsole.Blit(_mapConsole, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, _inventoryHeight);
             RLConsole.Blit(_statConsole, 0, 0, _statWidth, _statHeight, _rootConsole, _mapWidth, 0);
-            RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _mapHeight+_inventoryHeight);
+            RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _mapHeight + _inventoryHeight);
             RLConsole.Blit(_inventoryConsole, 0, 0, _inventoryWidth, _inventoryHeight, _rootConsole, 0, 0);
 
             // Tell RLNET to draw the console that we set
