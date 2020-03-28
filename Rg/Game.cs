@@ -41,7 +41,7 @@ public static class Game
 
     // The stat console is to the right of the map and display player and monster stats
     private static readonly int _statWidth = 20;
-    private static readonly int _statHeight = 40;
+    private static readonly int _statHeight = 60;
     private static RLConsole _statConsole;
 
     // Above the map is the inventory console which shows the players equipment, abilities, and items
@@ -154,7 +154,11 @@ public static class Game
     {
         if (_renderRequired)
         {
-            DungeonMap.Draw(_mapConsole);
+            _mapConsole.Clear();
+            _statConsole.Clear();
+            _messageConsole.Clear();
+
+            DungeonMap.Draw(_mapConsole, _statConsole);
 
             MessageLog.Draw(_messageConsole);
             Player.Draw(_mapConsole, DungeonMap);

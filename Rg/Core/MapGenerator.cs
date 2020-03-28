@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Rg.Monsters;
 using RogueSharp;
+using RogueSharp.DiceNotation;
 
 namespace Rg.Core
 {
@@ -44,6 +46,34 @@ namespace Rg.Core
             _map.AddPlayer(player);
         }
 
+        private void PlaceMonsters()
+        {
+            foreach (var room in _map.Rooms)
+            {
+                // Each room has a 60% chance of having monsters
+                if (Dice.Roll("1D10") < 7)
+                {
+                    // Generate between 1 and 4 monsters
+                    var numberOfMonsters = Dice.Roll("1D4");
+                    for (int i = 0; i < numberOfMonsters; i++)
+                    {
+                        // Find a random walkable location in the room to place the monster
+                        Point randomRoomLocation = _map.GetRandomWalkableLocationInRoom(room);
+                        // It's possible that the room doesn't have space to place a monster
+                        // In that case skip creating the monster
+                        if (randomRoomLocation != null)
+                        {
+                            // Temporarily hard code this monster to be created at level 1
+                            var monster = Kobold.Create(1);
+                            monster.X = randomRoomLocation.X;
+                            monster.Y = randomRoomLocation.Y;
+                            _map.AddMonster(monster);
+                        }
+                    }
+                }
+            }
+        }
+
         // Generate a new map that places rooms randomly
         public DungeonMap CreateMap()
         {
@@ -77,7 +107,6 @@ namespace Rg.Core
             foreach (Rectangle room in _map.Rooms)
             {
                 CreateRoom(room);
-
             }
 
             // Iterate through each room that was generated
@@ -104,6 +133,8 @@ namespace Rg.Core
             }
 
             PlacePlayer();
+
+            PlaceMonsters();
 
             return _map;
         }
