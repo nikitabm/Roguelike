@@ -164,14 +164,16 @@ namespace Rg.Core
             {
                 // The cell the actor was previously on is now walkable
                 SetIsWalkable(actor.X, actor.Y, true);
+
+                // Try to open a door if one exists here
+                OpenDoor(actor, x, y);
                 // Update the actor's position
                 actor.X = x;
                 actor.Y = y;
                 // The new cell the actor is on is now not walkable
                 SetIsWalkable(actor.X, actor.Y, false);
 
-                // Try to open a door if one exists here
-                OpenDoor(actor, x, y);
+
 
                 // Don't forget to update the field of view if we just repositioned the player
                 if (actor is Player)
@@ -186,11 +188,11 @@ namespace Rg.Core
         // A helper method for setting the IsWalkable property on a Cell
         public void SetIsWalkable(int x, int y, bool isWalkable)
         {
-            Cell cell = (Cell)GetCell(x, y);
+            ICell cell = GetCell(x, y);
             SetCellProperties(cell.X, cell.Y, cell.IsTransparent, isWalkable, cell.IsExplored);
         }
 
-        private void SetConsoleSymbolForCell(RLConsole console, Cell cell)
+        private void SetConsoleSymbolForCell(RLConsole console, ICell cell)
         {
             // When we haven't explored a cell yet, we don't want to draw anything
             if (!cell.IsExplored)
