@@ -71,6 +71,7 @@
     <Compile Include="Core\SchedulingSystem.cs" />
     <Compile Include="Interfaces\IBehavior.cs" />
     <Compile Include="Behaviors\StandardMoveAndAttack.cs" />
+    <Compile Include="Core\Door.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

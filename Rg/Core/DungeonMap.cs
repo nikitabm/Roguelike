@@ -14,10 +14,12 @@ namespace Rg.Core
     {
         public List<Rectangle> Rooms;
         private readonly List<Monster> _monsters;
+        public List<Door> Doors { get; set; }
         public DungeonMap()
         {
             Rooms = new List<Rectangle>();
             _monsters = new List<Monster>();
+            Doors = new List<Door>();
         }
 
 
@@ -37,7 +39,7 @@ namespace Rg.Core
             SetIsWalkable(monster.X, monster.Y, false);
             Game.SchedulingSystem.Add(monster);
         }
-                   
+
         public void RemoveMonster(Monster monster)
         {
             _monsters.Remove(monster);
@@ -49,6 +51,27 @@ namespace Rg.Core
         public Monster GetMonsterAt(int x, int y)
         {
             return _monsters.FirstOrDefault(m => m.X == x && m.Y == y);
+        }
+
+        // Return the door at the x,y position or null if one is not found.
+        public Door GetDoor(int x, int y)
+        {
+            return Doors.SingleOrDefault(d => d.X == x && d.Y == y);
+        }
+
+        // The actor opens the door located at the x,y position
+        private void OpenDoor(Actor actor, int x, int y)
+        {
+            Door door = GetDoor(x, y);
+            if (door != null && !door.IsOpen)
+            {
+                door.IsOpen = true;
+                var cell = GetCell(x, y);
+                // Once the door is opened it should be marked as transparent and no longer block field-of-view
+                SetCellProperties(x, y, true, cell.IsWalkable, cell.IsExplored);
+
+                Game.MessageLog.Add($"{actor.Name} opened a door");
+            }
         }
 
         // Look for a random location in the room that is walkable.
@@ -89,12 +112,18 @@ namespace Rg.Core
 
         // The Draw method will be called each time the map is updated
         // It will render all of the symbols/colors for each cell to the map sub console
-        public void Draw(RLConsole mapConsole,RLConsole statConsole)
+        public void Draw(RLConsole mapConsole, RLConsole statConsole)
         {
             foreach (Cell cell in GetAllCells())
             {
                 SetConsoleSymbolForCell(mapConsole, cell);
             }
+
+            foreach (Door door in Doors)
+            {
+                door.Draw(mapConsole, this);
+            }
+
             // Keep an index so we know which position to draw monster stats at
             int i = 0;
 
@@ -140,6 +169,10 @@ namespace Rg.Core
                 actor.Y = y;
                 // The new cell the actor is on is now not walkable
                 SetIsWalkable(actor.X, actor.Y, false);
+
+                // Try to open a door if one exists here
+                OpenDoor(actor, x, y);
+
                 // Don't forget to update the field of view if we just repositioned the player
                 if (actor is Player)
                 {
