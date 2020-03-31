@@ -12,11 +12,15 @@ namespace Rg.Core
     // Our custom DungeonMap class extends the base RogueSharp Map class
     public class DungeonMap : Map
     {
-        public List<Rectangle> Rooms;
         private readonly List<Monster> _monsters;
+
+        public List<Rectangle> Rooms;
+        public Stairs StairsUp { get; set; }
+        public Stairs StairsDown { get; set; }
         public List<Door> Doors { get; set; }
         public DungeonMap()
         {
+            Game.SchedulingSystem.Clear();
             Rooms = new List<Rectangle>();
             _monsters = new List<Monster>();
             Doors = new List<Door>();
@@ -46,6 +50,12 @@ namespace Rg.Core
             // After removing the monster from the map, make sure the cell is walkable again
             SetIsWalkable(monster.X, monster.Y, true);
             Game.SchedulingSystem.Remove(monster);
+        }
+
+        public bool CanMoveDownToNextLevel()
+        {
+            Player player = Game.Player;
+            return StairsDown.X == player.X && StairsDown.Y == player.Y;
         }
 
         public Monster GetMonsterAt(int x, int y)
@@ -124,6 +134,8 @@ namespace Rg.Core
                 door.Draw(mapConsole, this);
             }
 
+            StairsUp.Draw(mapConsole, this);
+            StairsDown.Draw(mapConsole, this);
             // Keep an index so we know which position to draw monster stats at
             int i = 0;
 

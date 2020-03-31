@@ -60,6 +60,7 @@
     <Compile Include="Core\MapGenerator.cs" />
     <Compile Include="Core\MessageLog.cs" />
     <Compile Include="Core\Player.cs" />
+    <Compile Include="Core\Stairs.cs" />
     <Compile Include="Core\Swatch.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Interfaces\IActor.cs" />
@@ -83,9 +84,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Monsters\" />
-    <Folder Include="Behaviors\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -20,7 +20,7 @@ public static class Game
     public static SchedulingSystem SchedulingSystem { get; private set; }
 
     private static bool _renderRequired = true;
-
+    private static int _mapLevel = 1;
 
     //private 
 
@@ -57,9 +57,9 @@ public static class Game
         int seed = (int)DateTime.UtcNow.Ticks;
         Random = new DotNetRandom(seed);
 
-        // The title will appear at the top of the console window 
+        // The title will appear at the top of the console window
         // also include the seed used to generate the level
-        string consoleTitle = $"game seed {seed}";
+        string consoleTitle = $"Level {_mapLevel} - Seed {seed}";
 
         CommandSystem = new CommandSystem();
         SchedulingSystem = new SchedulingSystem();
@@ -67,7 +67,7 @@ public static class Game
 
 
         //generate map
-        MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7);
+        MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, _mapLevel);
         DungeonMap = mapGenerator.CreateMap();
 
         MessageLog.Add("The rogue " + Player.Name + " arrives on level 1");
@@ -143,6 +143,18 @@ public static class Game
                 else if (keyPress.Key == RLKey.Escape)
                 {
                     _rootConsole.Close();
+                }
+                else if (keyPress.Key == RLKey.Period)
+                {
+                    if (DungeonMap.CanMoveDownToNextLevel())
+                    {
+                        MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++_mapLevel);
+                        DungeonMap = mapGenerator.CreateMap();
+                        MessageLog = new MessageLog();
+                        CommandSystem = new CommandSystem();
+                        _rootConsole.Title = $"RougeSharp RLNet Tutorial - Level {_mapLevel}";
+                        didPlayerAct = true;
+                    }
                 }
             }
             if (didPlayerAct)
