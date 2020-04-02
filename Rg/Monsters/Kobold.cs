@@ -4,7 +4,7 @@ using Rg.Core;
 
 namespace Rg.Monsters
 {
-    public class Kobold:Monster
+    public class Kobold : Monster
     {
         public static Kobold Create(int level)
         {

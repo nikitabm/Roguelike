@@ -6,24 +6,12 @@ using System.Threading.Tasks;
 using RLNET;
 using Rg.Core;
 using RogueSharp.Random;
+using System.IO;
 
 public static class Game
 {
 
-
-    //public 
-    public static MessageLog MessageLog { get; private set; }
-    public static IRandom Random { get; private set; }
-    public static Player Player { get; set; }
-    public static DungeonMap DungeonMap { get; private set; }
-    public static CommandSystem CommandSystem { get; private set; }
-    public static SchedulingSystem SchedulingSystem { get; private set; }
-
-    private static bool _renderRequired = true;
-    private static int _mapLevel = 1;
-
-    //private 
-
+    //private
 
     // The screen height and width are in number of tiles
     private static readonly int _screenWidth = 100;
@@ -50,8 +38,63 @@ public static class Game
     private static readonly int _inventoryHeight = 10;
     private static RLConsole _inventoryConsole;
 
+    private static readonly int _textScreenWidth = 80;
+    private static readonly int _textScreenHeight = 50;
+    private static RLConsole _textScreenConsole;
 
 
+    //vars
+    private static bool _renderRequired = true;
+    private static string _path = "../save.txt";
+    private static int _mapLevel = 1;
+    private static int _generation = 1;
+    private static bool _running = true;
+
+    //public 
+    public static MessageLog MessageLog { get; private set; }
+    public static IRandom Random { get; private set; }
+    public static Player Player { get; set; }
+    public static DungeonMap DungeonMap { get; private set; }
+    public static CommandSystem CommandSystem { get; private set; }
+    public static SchedulingSystem SchedulingSystem { get; private set; }
+
+
+    public static int Level
+    {
+        get
+        {
+            return _mapLevel;
+        }
+    }
+    public static int Generation
+    {
+        get
+        {
+            return _generation;
+        }
+        set
+        {
+            _generation = value;
+        }
+    }
+    public static string Path
+    {
+        get
+        {
+            return _path;
+        }
+    }
+    public static bool Running
+    {
+        get
+        {
+            return _running;
+        }
+        set
+        {
+            _running = value;
+        }
+    }
     public static void Main()
     {
         int seed = (int)DateTime.UtcNow.Ticks;
@@ -70,7 +113,22 @@ public static class Game
         MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, _mapLevel);
         DungeonMap = mapGenerator.CreateMap();
 
-        MessageLog.Add("The rogue " + Player.Name + " arrives on level 1");
+
+
+        if (!File.Exists(_path))
+        {
+            var sw = File.CreateText(_path);
+            sw.WriteLine(_generation.ToString());
+            sw.Close();
+        }
+        if (File.Exists(_path))
+        {
+            StreamReader reader = new StreamReader(_path);
+            _generation = int.Parse(reader.ReadLine());
+            reader.Close();
+        }
+
+        MessageLog.Add("The old servant of elders got summoned " + Player.Name + " " + _generation + " arrives on level 1");
         MessageLog.Add($"Level created with seed '{seed}'");
 
         DungeonMap.UpdatePlayerFieldOfView();
@@ -114,46 +172,60 @@ public static class Game
 
         //_rootConsole.SetWindowState(RLWindowState.Fullscreen);
     }
-
+    public static void SaveData()
+    {
+        var sw = new StreamWriter(_path);
+        _generation++;
+        sw.WriteLine(_generation.ToString());
+        sw.Close();
+    }
     static void OnUpdate(object sender, UpdateEventArgs e)
     {
-        bool didPlayerAct = false;
         RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
+
+        bool didPlayerAct = false;
 
         if (CommandSystem.IsPlayerTurn)
         {
             if (keyPress != null)
             {
-                if ((keyPress.Key == RLKey.W) || (keyPress.Key == RLKey.Up))
+                if (keyPress.Key == RLKey.Escape)
                 {
-                    didPlayerAct = CommandSystem.MovePlayer(Direction.Up);
-                }
-                else if (keyPress.Key == RLKey.S || (keyPress.Key == RLKey.Down))
-                {
-                    didPlayerAct = CommandSystem.MovePlayer(Direction.Down);
-                }
-                else if (keyPress.Key == RLKey.A || (keyPress.Key == RLKey.Left))
-                {
-                    didPlayerAct = CommandSystem.MovePlayer(Direction.Left);
-                }
-                else if (keyPress.Key == RLKey.D || (keyPress.Key == RLKey.Right))
-                {
-                    didPlayerAct = CommandSystem.MovePlayer(Direction.Right);
-                }
-                else if (keyPress.Key == RLKey.Escape)
-                {
+                    if (_running)
+                    {
+                        SaveData();
+                    }
                     _rootConsole.Close();
                 }
-                else if (keyPress.Key == RLKey.Period)
+                if (_running)
                 {
-                    if (DungeonMap.CanMoveDownToNextLevel())
+                    if ((keyPress.Key == RLKey.W) || (keyPress.Key == RLKey.Up))
                     {
-                        MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++_mapLevel);
-                        DungeonMap = mapGenerator.CreateMap();
-                        MessageLog = new MessageLog();
-                        CommandSystem = new CommandSystem();
-                        _rootConsole.Title = $"RougeSharp RLNet Tutorial - Level {_mapLevel}";
-                        didPlayerAct = true;
+                        didPlayerAct = CommandSystem.MovePlayer(Direction.Up);
+                    }
+                    else if (keyPress.Key == RLKey.S || (keyPress.Key == RLKey.Down))
+                    {
+                        didPlayerAct = CommandSystem.MovePlayer(Direction.Down);
+                    }
+                    else if (keyPress.Key == RLKey.A || (keyPress.Key == RLKey.Left))
+                    {
+                        didPlayerAct = CommandSystem.MovePlayer(Direction.Left);
+                    }
+                    else if (keyPress.Key == RLKey.D || (keyPress.Key == RLKey.Right))
+                    {
+                        didPlayerAct = CommandSystem.MovePlayer(Direction.Right);
+                    }
+                    else if (keyPress.Key == RLKey.Period)
+                    {
+                        if (DungeonMap.CanMoveDownToNextLevel())
+                        {
+                            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++_mapLevel);
+                            DungeonMap = mapGenerator.CreateMap();
+                            MessageLog = new MessageLog();
+                            CommandSystem = new CommandSystem();
+                            _rootConsole.Title = $"RougeSharp RLNet Tutorial - Level {_mapLevel}";
+                            didPlayerAct = true;
+                        }
                     }
                 }
             }

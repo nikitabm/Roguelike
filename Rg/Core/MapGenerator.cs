@@ -66,32 +66,31 @@ namespace Rg.Core
         {
             foreach (var room in _map.Rooms)
             {
-                // Each room has a 60% chance of having monsters
-                if (Dice.Roll("1D10") < 7)
-                {
-                    // Generate between 1 and 4 monsters
-                    var numberOfMonsters = Dice.Roll("1D4");
-                    for (int i = 0; i < numberOfMonsters; i++)
+
+                // Generate between 1 and 4 monsters
+                var numberOfMonsters = Dice.Roll($"1D{(int)(Game.Level + 1) / 2}");
+                for (int i = 0; i < numberOfMonsters; i++)
+                    if (Dice.Roll("1D10") < 4)
                     {
-                        // Find a random walkable location in the room to place the monster
-                        Point randomRoomLocation = _map.GetRandomWalkableLocationInRoom(room);
-                        // It's possible that the room doesn't have space to place a monster
-                        // In that case skip creating the monster
-                        if (randomRoomLocation != null)
                         {
-                            // Temporarily hard code this monster to be created at level 1
-                            var monster = Kobold.Create(1);
-                            monster.X = randomRoomLocation.X;
-                            monster.Y = randomRoomLocation.Y;
-                            _map.AddMonster(monster);
+                            // Find a random walkable location in the room to place the monster
+                            Point randomRoomLocation = _map.GetRandomWalkableLocationInRoom(room);
+                            // It's possible that the room doesn't have space to place a monster
+                            // In that case skip creating the monster
+                            if (randomRoomLocation != null)
+                            {
+                                // Temporarily hard code this monster to be created at level 1
+                                var monster = Kobold.Create(Game.Level);
+                                monster.X = randomRoomLocation.X;
+                                monster.Y = randomRoomLocation.Y;
+                                _map.AddMonster(monster);
+                            }
                         }
                     }
-                }
             }
         }
         private void CreateDoors(Rectangle room)
         {
-            Console.WriteLine("Test");
             // The the boundries of the room
             int xMin = room.Left;
             int xMax = room.Right;

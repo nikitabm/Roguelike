@@ -35,7 +35,6 @@ namespace Rg.Core
             UpdatePlayerFieldOfView();
             Game.SchedulingSystem.Add(player);
         }
-
         public void AddMonster(Monster monster)
         {
             _monsters.Add(monster);

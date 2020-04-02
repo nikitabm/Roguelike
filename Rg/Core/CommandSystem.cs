@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -204,9 +205,11 @@ namespace Rg.Core
         // Remove the defender from the map and add some messages upon death.
         private static void ResolveDeath(Actor defender)
         {
-            if (defender is Player)
+            if (defender is Player && Game.Running)
             {
-                Game.MessageLog.Add($"  {defender.Name} was killed, GAME OVER MAN!");
+                Game.MessageLog.Add($" {defender.Name} {Game.Generation} was killed.");
+                Game.SaveData();
+                Game.Running = false;
             }
             else if (defender is Monster)
             {
