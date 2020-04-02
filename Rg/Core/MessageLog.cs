@@ -12,15 +12,23 @@ namespace Rg.Core
     public class MessageLog
     {
         // Define the maximum number of lines to store
-        private static readonly int _maxLines = 9;
+        private int _maxLines;
 
         // Use a Queue to keep track of the lines of text
         // The first line added to the log will also be the first removed
         private readonly Queue<string> _lines;
 
-        public MessageLog()
+        public MessageLog(int maxLines=9)
         {
+            _maxLines = maxLines;
             _lines = new Queue<string>();
+        }
+        public void Clear()
+        {
+            while (_lines.Count > 0)
+            {
+                _lines.Dequeue();
+            }
         }
 
         // Add a line to the MessageLog queue

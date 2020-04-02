@@ -13,7 +13,14 @@ namespace Rg.Core
     public class CommandSystem
     {
         public bool IsPlayerTurn { get; set; }
-
+        public enum EGameState
+        {
+            GameStart,
+            PlayerTurn,
+            EnemyTurn,
+            GameEnd
+        }
+        public static EGameState GameState = EGameState.GameStart;
         // Return value is true if the player was able to move
         // false when the player couldn't move, such as trying to move into a wall
         public bool MovePlayer(Direction direction)
@@ -65,9 +72,13 @@ namespace Rg.Core
             return false;
         }
 
-        public void EndPlayerTurn()
+
+        public static void SetGameState(EGameState state)
         {
-            IsPlayerTurn = false;
+            if (GameState != EGameState.GameEnd)
+            {
+                GameState = state;
+            }
         }
 
         public void ActivateActors()
@@ -75,7 +86,7 @@ namespace Rg.Core
             IScheduleable scheduleable = Game.SchedulingSystem.Get();
             if (scheduleable is Player)
             {
-                IsPlayerTurn = true;
+                SetGameState(EGameState.PlayerTurn);
                 Game.SchedulingSystem.Add(Game.Player);
             }
             else
@@ -205,11 +216,11 @@ namespace Rg.Core
         // Remove the defender from the map and add some messages upon death.
         private static void ResolveDeath(Actor defender)
         {
-            if (defender is Player && Game.Running)
+            if (defender is Player && GameState != EGameState.GameEnd)
             {
                 Game.MessageLog.Add($" {defender.Name} {Game.Generation} was killed.");
-                Game.SaveData();
-                Game.Running = false;
+                SetGameState(EGameState.GameEnd);
+                Game.End();
             }
             else if (defender is Monster)
             {

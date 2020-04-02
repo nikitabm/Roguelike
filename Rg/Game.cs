@@ -7,7 +7,6 @@ using RLNET;
 using Rg.Core;
 using RogueSharp.Random;
 using System.IO;
-
 public static class Game
 {
 
@@ -38,8 +37,8 @@ public static class Game
     private static readonly int _inventoryHeight = 10;
     private static RLConsole _inventoryConsole;
 
-    private static readonly int _textScreenWidth = 80;
-    private static readonly int _textScreenHeight = 50;
+    private static readonly int _textScreenWidth = 100;
+    private static readonly int _textScreenHeight = 70;
     private static RLConsole _textScreenConsole;
 
 
@@ -49,15 +48,15 @@ public static class Game
     private static int _mapLevel = 1;
     private static int _generation = 1;
     private static bool _running = true;
-
+    private static bool _showTextConsole = false;
     //public 
     public static MessageLog MessageLog { get; private set; }
+    public static MessageLog TextConsoleLog { get; private set; }
     public static IRandom Random { get; private set; }
     public static Player Player { get; set; }
     public static DungeonMap DungeonMap { get; private set; }
     public static CommandSystem CommandSystem { get; private set; }
     public static SchedulingSystem SchedulingSystem { get; private set; }
-
 
     public static int Level
     {
@@ -107,7 +106,7 @@ public static class Game
         CommandSystem = new CommandSystem();
         SchedulingSystem = new SchedulingSystem();
         MessageLog = new MessageLog();
-
+        TextConsoleLog = new MessageLog(100);
 
         //generate map
         MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, _mapLevel);
@@ -152,6 +151,8 @@ public static class Game
         _statConsole = new RLConsole(_statWidth, _statHeight);
         _inventoryConsole = new RLConsole(_inventoryWidth, _inventoryHeight);
 
+
+
         _rootConsole.Update += OnUpdate;
         _rootConsole.Render += OnRender;
         _rootConsole.OnLoad += OnLoad;
@@ -169,8 +170,23 @@ public static class Game
 
     static void OnLoad(object sender, EventArgs e)
     {
-
         //_rootConsole.SetWindowState(RLWindowState.Fullscreen);
+    }
+    public static void SetTextConsole(bool visible, string text = "")
+    {
+        TextConsoleLog.Clear();
+        TextConsoleLog.Add(text);
+        _showTextConsole = visible;
+    }
+    public static void End()
+    {
+        _textScreenConsole = new RLConsole(_textScreenWidth, _textScreenHeight);
+        TextConsoleLog.Add($"=========================================");
+        TextConsoleLog.Add($"          {Player.Name} {_generation} died.             ");
+        TextConsoleLog.Add($"=========================================");
+        SaveData();
+        _showTextConsole = true;
+        _renderRequired = true;
     }
     public static void SaveData()
     {
@@ -185,60 +201,69 @@ public static class Game
 
         bool didPlayerAct = false;
 
-        if (CommandSystem.IsPlayerTurn)
+        switch (CommandSystem.GameState)
         {
-            if (keyPress != null)
-            {
-                if (keyPress.Key == RLKey.Escape)
+            case CommandSystem.EGameState.GameStart:
+                if (keyPress == null) return;
+                if (keyPress.Key == RLKey.Space)
                 {
-                    if (_running)
+                    CommandSystem.SetGameState(CommandSystem.EGameState.PlayerTurn);
+                }
+                break;
+
+            case CommandSystem.EGameState.PlayerTurn:
+                if (keyPress == null) return;
+                if ((keyPress.Key == RLKey.W) || (keyPress.Key == RLKey.Up))
+                {
+                    didPlayerAct = CommandSystem.MovePlayer(Direction.Up);
+                }
+                else if (keyPress.Key == RLKey.S || (keyPress.Key == RLKey.Down))
+                {
+                    didPlayerAct = CommandSystem.MovePlayer(Direction.Down);
+                }
+                else if (keyPress.Key == RLKey.A || (keyPress.Key == RLKey.Left))
+                {
+                    didPlayerAct = CommandSystem.MovePlayer(Direction.Left);
+                }
+                else if (keyPress.Key == RLKey.D || (keyPress.Key == RLKey.Right))
+                {
+                    didPlayerAct = CommandSystem.MovePlayer(Direction.Right);
+                }
+                else if (keyPress.Key == RLKey.Period)
+                {
+                    if (DungeonMap.CanMoveDownToNextLevel())
                     {
-                        SaveData();
+                        MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++_mapLevel);
+                        DungeonMap = mapGenerator.CreateMap();
+                        MessageLog = new MessageLog();
+                        CommandSystem = new CommandSystem();
+                        _rootConsole.Title = $"RougeSharp RLNet Tutorial - Level {_mapLevel}";
+                        didPlayerAct = true;
                     }
+                }
+                else if (keyPress.Key == RLKey.Escape)
+                {
+                    SaveData();
                     _rootConsole.Close();
                 }
-                if (_running)
+                if (didPlayerAct)
                 {
-                    if ((keyPress.Key == RLKey.W) || (keyPress.Key == RLKey.Up))
-                    {
-                        didPlayerAct = CommandSystem.MovePlayer(Direction.Up);
-                    }
-                    else if (keyPress.Key == RLKey.S || (keyPress.Key == RLKey.Down))
-                    {
-                        didPlayerAct = CommandSystem.MovePlayer(Direction.Down);
-                    }
-                    else if (keyPress.Key == RLKey.A || (keyPress.Key == RLKey.Left))
-                    {
-                        didPlayerAct = CommandSystem.MovePlayer(Direction.Left);
-                    }
-                    else if (keyPress.Key == RLKey.D || (keyPress.Key == RLKey.Right))
-                    {
-                        didPlayerAct = CommandSystem.MovePlayer(Direction.Right);
-                    }
-                    else if (keyPress.Key == RLKey.Period)
-                    {
-                        if (DungeonMap.CanMoveDownToNextLevel())
-                        {
-                            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++_mapLevel);
-                            DungeonMap = mapGenerator.CreateMap();
-                            MessageLog = new MessageLog();
-                            CommandSystem = new CommandSystem();
-                            _rootConsole.Title = $"RougeSharp RLNet Tutorial - Level {_mapLevel}";
-                            didPlayerAct = true;
-                        }
-                    }
+                    _renderRequired = true;
+                    CommandSystem.SetGameState(CommandSystem.EGameState.EnemyTurn);
                 }
-            }
-            if (didPlayerAct)
-            {
+                break;
+
+            case CommandSystem.EGameState.EnemyTurn:
+                CommandSystem.ActivateActors();
                 _renderRequired = true;
-                CommandSystem.EndPlayerTurn();
-            }
-        }
-        else
-        {
-            CommandSystem.ActivateActors();
-            _renderRequired = true;
+                break;
+            case CommandSystem.EGameState.GameEnd:
+                if (keyPress == null) return;
+                else if (keyPress.Key == RLKey.Escape)
+                {
+                    _rootConsole.Close();
+                }
+                break;
         }
     }
 
@@ -263,6 +288,11 @@ public static class Game
             RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, _mapHeight + _inventoryHeight);
             RLConsole.Blit(_inventoryConsole, 0, 0, _inventoryWidth, _inventoryHeight, _rootConsole, 0, 0);
 
+            if (_showTextConsole)
+            {
+                TextConsoleLog.Draw(_textScreenConsole);
+                RLConsole.Blit(_textScreenConsole, 0, 0, _textScreenWidth, _textScreenHeight, _rootConsole, 0, 0);
+            }
             // Tell RLNET to draw the console that we set
             _rootConsole.Draw();
 
