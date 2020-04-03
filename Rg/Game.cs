@@ -44,7 +44,7 @@ public static class Game
 
     //vars
     private static bool _renderRequired = true;
-    private static string _path = "../save.txt";
+    private static string _path = "save.txt";
     private static int _mapLevel = 1;
     private static int _generation = 1;
     private static bool _running = true;
@@ -101,7 +101,7 @@ public static class Game
 
         // The title will appear at the top of the console window
         // also include the seed used to generate the level
-        string consoleTitle = $"Level {_mapLevel} - Seed {seed}";
+        string consoleTitle = "Game by Nikita Balabuiev";
 
         CommandSystem = new CommandSystem();
         SchedulingSystem = new SchedulingSystem();
@@ -126,9 +126,9 @@ public static class Game
             _generation = int.Parse(reader.ReadLine());
             reader.Close();
         }
-
-        MessageLog.Add("The old servant of elders got summoned " + Player.Name + " " + _generation + " arrives on level 1");
-        MessageLog.Add($"Level created with seed '{seed}'");
+        MessageLog.Add("Welcome! I will implement name input, but for now...");
+        MessageLog.Add("I hope you like name Lucy, because your name is Lucy");
+        MessageLog.Add("The old servant of elders got summoned. " + Player.Name + " " + _generation + " finds herself in the library dungeon storage.");
 
         DungeonMap.UpdatePlayerFieldOfView();
 
@@ -140,8 +140,8 @@ public static class Game
         settings.Height = _screenHeight;
         settings.Scale = 1.0f;
         settings.ResizeType = RLResizeType.ResizeScale;
-        settings.WindowBorder = RLWindowBorder.Fixed;
-        settings.StartWindowState = RLWindowState.Normal;
+        settings.WindowBorder = RLWindowBorder.Resizable;
+        settings.StartWindowState = RLWindowState.Fullscreen;
         settings.Title = consoleTitle;
 
         _rootConsole = new RLRootConsole(settings);
@@ -150,7 +150,9 @@ public static class Game
         _messageConsole = new RLConsole(_messageWidth, _messageHeight);
         _statConsole = new RLConsole(_statWidth, _statHeight);
         _inventoryConsole = new RLConsole(_inventoryWidth, _inventoryHeight);
+        _textScreenConsole = new RLConsole(_textScreenWidth, _textScreenHeight);
 
+        _textScreenConsole.SetBackColor(0, 0, Colors.Gold);
 
 
         _rootConsole.Update += OnUpdate;
@@ -164,6 +166,11 @@ public static class Game
 
         _inventoryConsole.SetBackColor(0, 0, _inventoryWidth, _inventoryHeight, Swatch.DbWood);
         _inventoryConsole.Print(1, 1, "Inventory", Colors.TextHeading);
+
+
+        TextConsoleLog.Add($"Visible frustration on the Lueltein's face grew more and more frustrative.");
+
+        _showTextConsole = true;
 
         _rootConsole.Run();
     }
@@ -180,7 +187,7 @@ public static class Game
     }
     public static void End()
     {
-        _textScreenConsole = new RLConsole(_textScreenWidth, _textScreenHeight);
+        TextConsoleLog.Clear();
         TextConsoleLog.Add($"=========================================");
         TextConsoleLog.Add($"          {Player.Name} {_generation} died.             ");
         TextConsoleLog.Add($"=========================================");
@@ -207,7 +214,9 @@ public static class Game
                 if (keyPress == null) return;
                 if (keyPress.Key == RLKey.Space)
                 {
+                    _showTextConsole = false;
                     CommandSystem.SetGameState(CommandSystem.EGameState.PlayerTurn);
+                    _renderRequired = true;
                 }
                 break;
 
@@ -237,7 +246,7 @@ public static class Game
                         DungeonMap = mapGenerator.CreateMap();
                         MessageLog = new MessageLog();
                         CommandSystem = new CommandSystem();
-                        _rootConsole.Title = $"RougeSharp RLNet Tutorial - Level {_mapLevel}";
+                        _rootConsole.Title = "Game by Nikita Balabuiev";
                         didPlayerAct = true;
                     }
                 }
@@ -259,7 +268,7 @@ public static class Game
                 break;
             case CommandSystem.EGameState.GameEnd:
                 if (keyPress == null) return;
-                else if (keyPress.Key == RLKey.Escape)
+                else if ((keyPress.Key == RLKey.Escape) || (keyPress.Key == RLKey.Space))
                 {
                     _rootConsole.Close();
                 }
@@ -274,6 +283,7 @@ public static class Game
             _mapConsole.Clear();
             _statConsole.Clear();
             _messageConsole.Clear();
+            _textScreenConsole.Clear();
 
             DungeonMap.Draw(_mapConsole, _statConsole);
 

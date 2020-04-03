@@ -18,17 +18,14 @@ namespace Rg.Core
         // The first line added to the log will also be the first removed
         private readonly Queue<string> _lines;
 
-        public MessageLog(int maxLines=9)
+        public MessageLog(int maxLines = 9)
         {
             _maxLines = maxLines;
             _lines = new Queue<string>();
         }
         public void Clear()
         {
-            while (_lines.Count > 0)
-            {
-                _lines.Dequeue();
-            }
+            _lines.Clear();
         }
 
         // Add a line to the MessageLog queue
