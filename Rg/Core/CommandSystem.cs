@@ -226,7 +226,9 @@ namespace Rg.Core
             {
                 Game.DungeonMap.RemoveMonster((Monster)defender);
 
-                Game.MessageLog.Add($"  {defender.Name} died and dropped {defender.Gold} gold");
+                Game.MessageLog.Add($"  {defender.Name} died.");
+                Game.Player.GainExp();
+                
             }
         }
 

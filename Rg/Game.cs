@@ -41,7 +41,6 @@ public static class Game
     private static readonly int _textScreenHeight = 70;
     private static RLConsole _textScreenConsole;
 
-
     //vars
     private static bool _renderRequired = true;
     private static string _path = "save.txt";
@@ -126,9 +125,9 @@ public static class Game
             _generation = int.Parse(reader.ReadLine());
             reader.Close();
         }
-        MessageLog.Add("Welcome! I will implement name input, but for now...");
-        MessageLog.Add("I hope you like name Lucy, because your name is Lucy");
-        MessageLog.Add("The old servant of elders got summoned. " + Player.Name + " " + _generation + " finds herself in the library dungeon storage.");
+        MessageLog.Add("As the book finally touches floor it turns into... You.");
+        MessageLog.Add("I hope you like name Lucy, because your name is Lucy. Lucy was one of the authors of this book-you");
+        MessageLog.Add("The  servant of Lueltein got summoned. " + Player.Name + " " + _generation + " finds herself in the library storage.");
 
         DungeonMap.UpdatePlayerFieldOfView();
 
@@ -138,13 +137,12 @@ public static class Game
         settings.CharHeight = 8;
         settings.Width = _screenWidth;
         settings.Height = _screenHeight;
-        settings.Scale = 1.0f;
-        settings.ResizeType = RLResizeType.ResizeScale;
+        settings.Scale = 1.9f;
         settings.WindowBorder = RLWindowBorder.Resizable;
-        settings.StartWindowState = RLWindowState.Fullscreen;
         settings.Title = consoleTitle;
 
         _rootConsole = new RLRootConsole(settings);
+        _rootConsole.SetWindowState(RLWindowState.Fullscreen);
 
         _mapConsole = new RLConsole(_mapWidth, _mapHeight);
         _messageConsole = new RLConsole(_messageWidth, _messageHeight);
@@ -169,6 +167,39 @@ public static class Game
 
 
         TextConsoleLog.Add($"Visible frustration on the Lueltein's face grew more and more frustrative.");
+        TextConsoleLog.Add($"");
+
+        TextConsoleLog.Add($"He've been conducting an important research lately (for the past 100 years).");
+        TextConsoleLog.Add($"");
+
+        TextConsoleLog.Add($"Walking along numberless bookcases he seems to be unable to find what he is looking for.");
+        TextConsoleLog.Add($"");
+
+        TextConsoleLog.Add($"-I have to get some books from the library's storage but I'm too lazy...");
+        TextConsoleLog.Add($"");
+
+        TextConsoleLog.Add($"");
+        TextConsoleLog.Add($"");
+        TextConsoleLog.Add($"");
+        TextConsoleLog.Add($"");
+        TextConsoleLog.Add($"Randomly reaching out for a book, Lueltein picks one from the bookcase.");
+        TextConsoleLog.Add($"");
+        TextConsoleLog.Add($"Mumbling some sort of spell Lueltein comes to the staircase leading to the storage rooms.");
+        TextConsoleLog.Add($"");
+        TextConsoleLog.Add($"Go get books I am looking for.Your sight will only see those books so it should be easy.");
+        TextConsoleLog.Add($"");
+        TextConsoleLog.Add($"I guess there are some creatures living there, but you are able to defend yourself Im sure.");
+        TextConsoleLog.Add($"");
+        TextConsoleLog.Add($"With these words he throws the book into the darkness.");
+        TextConsoleLog.Add($"");
+        TextConsoleLog.Add($"The Book had title: 'Forgotten art of being productive during corona quarantine 2020'");
+        TextConsoleLog.Add($"");
+        TextConsoleLog.Add($"Maybe it was not the best book to get rid of....");
+        TextConsoleLog.Add($"");
+        TextConsoleLog.Add($"");
+        TextConsoleLog.Add($"");
+
+        TextConsoleLog.Add("Press SPACE TO CONTINUE");
 
         _showTextConsole = true;
 
@@ -177,7 +208,6 @@ public static class Game
 
     static void OnLoad(object sender, EventArgs e)
     {
-        //_rootConsole.SetWindowState(RLWindowState.Fullscreen);
     }
     public static void SetTextConsole(bool visible, string text = "")
     {

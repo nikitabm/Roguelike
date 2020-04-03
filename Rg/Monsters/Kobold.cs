@@ -11,8 +11,8 @@ namespace Rg.Monsters
             int health = Dice.Roll("2D5");
             return new Kobold
             {
-                Attack = 100,
-                //Attack = Dice.Roll("1D3") + level / 3,
+                //Attack = 100,
+                Attack = Dice.Roll("1D3") + level / 3,
                 AttackChance = Dice.Roll("25D3"),
                 Awareness = 10,
                 Color = Colors.KoboldColor,

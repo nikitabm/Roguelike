@@ -45,7 +45,23 @@ namespace Rg.Core
 
             _map.AddPlayer(player);
         }
+        private void CreateBook()
+        {
+            var room = Dice.Roll($"1D{_map.Rooms.Count - 2}");
+            Point randomLocation = _map.GetRandomWalkableLocationInRoom(_map.Rooms[room + 1]);
+            if (randomLocation != null)
+            {
 
+                var item = new Item();
+                item.X = randomLocation.X;
+                item.Y = randomLocation.Y;
+                item.Color = Colors.Player;
+                item.Symbol = 'b';
+                item.Type = 0;
+
+                _map.item = item;
+            }
+        }
         private void CreateStairs()
         {
             _map.StairsUp = new Stairs
@@ -230,6 +246,7 @@ namespace Rg.Core
 
             PlaceMonsters();
 
+            CreateBook();
             return _map;
         }
 

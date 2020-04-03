@@ -36,8 +36,8 @@
     <Reference Include="OpenTK, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Include="RLNET, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RLNET.1.0.6\lib\RLNET.dll</HintPath>
+    <Reference Include="RLNET, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RLNET.1.0.5.3\lib\RLNET.dll</HintPath>
     </Reference>
     <Reference Include="RogueSharp, Version=4.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\RogueSharp.4.2.0\lib\net40\RogueSharp.dll</HintPath>
@@ -57,6 +57,7 @@
     <Compile Include="Core\CommandSystem.cs" />
     <Compile Include="Core\Direction.cs" />
     <Compile Include="Core\DungeonMap.cs" />
+    <Compile Include="Core\Item.cs" />
     <Compile Include="Core\MapGenerator.cs" />
     <Compile Include="Core\MessageLog.cs" />
     <Compile Include="Core\Player.cs" />

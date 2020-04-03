@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using RogueSharp;
 using RLNET;
 
-
 namespace Rg.Core
 {
     // Our custom DungeonMap class extends the base RogueSharp Map class
@@ -18,6 +17,8 @@ namespace Rg.Core
         public Stairs StairsUp { get; set; }
         public Stairs StairsDown { get; set; }
         public List<Door> Doors { get; set; }
+        public Item item;
+
         public DungeonMap()
         {
             Game.SchedulingSystem.Clear();
@@ -133,6 +134,7 @@ namespace Rg.Core
                 door.Draw(mapConsole, this);
             }
 
+            item.Draw(mapConsole, this);
             StairsUp.Draw(mapConsole, this);
             StairsDown.Draw(mapConsole, this);
             // Keep an index so we know which position to draw monster stats at

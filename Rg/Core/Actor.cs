@@ -23,6 +23,9 @@ namespace Rg.Core
         private int _maxHealth;
         private string _name;
         private int _speed;
+        private int _exp;
+        private int _level;
+
 
 
         //getters and setters for stats
@@ -156,7 +159,28 @@ namespace Rg.Core
                 _speed = value;
             }
         }
-
+        public int Exp
+        {
+            get
+            {
+                return _exp;
+            }
+            protected set
+            {
+                _exp = value;
+            }
+        }
+        public int Level
+        {
+            get
+            {
+                return _level;
+            }
+            protected set
+            {
+                _level = value;
+            }
+        }
         public virtual void PerformAction(CommandSystem commandSystem)
         {
             throw new NotImplementedException();
